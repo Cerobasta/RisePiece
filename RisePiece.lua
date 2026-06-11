@@ -1,4 +1,4 @@
--- Anti-Duplicate Window cleaner
+-- Anti-Duplicate Window Cleaner
 if game:GetService("CoreGui"):FindFirstChild("Cero_Hub_RisePiece") then
     game:GetService("CoreGui").Cero_Hub_RisePiece:Destroy()
 end
@@ -9,12 +9,13 @@ _G.autofarmBoss = false
 
 local Config = {
     FarmMethod = "Upper",      -- "Upper", "Lower", "Behind"
-    FarmDistance = 5,          -- 6 to 24 Studs via slider
+    FarmDistance = 5,          -- Custom offset via slider
+    SelectedWeapon = "Default",-- Dynamically managed by your dropdown choices
     MovementType = "Teleport", -- "Tween" or "Teleport"
     TweenSpeed = 300
 }
 
--- Multi-Selection Target Arrays (Reorganized based on your Dex screenshots)
+-- Multi-Selection Target Arrays (Reorganized based on Rise Piece Dex)
 local TargetsSelected = {
     -- Normal Grunts Class
     ["Bandit"] = false,
@@ -43,17 +44,27 @@ local Player = game:GetService("Players").LocalPlayer
 local TweenService = game:GetService("TweenService")
 local inputService = game:GetService("UserInputService")
 
--- Dynamic Active Weapon Detector (Automatically replaces "Combat" with your sword/fruit name)
-local function getActiveWeaponName()
+-- Active Tool Scanner Engine
+local function getAvailableWeapons()
+    local list = {}
     local char = Player.Character
+    local backpack = Player:FindFirstChild("Backpack")
+    
     if char then
-        local activeTool = char:FindFirstChildOfClass("Tool")
-        if activeTool then
-            return activeTool.Name
+        for _, item in pairs(char:GetChildren()) do
+            if item:IsA("Tool") and not table.find(list, item.Name) then table.insert(list, item.Name) end
         end
     end
-    return "Combat" -- Fallback baseline state
+    if backpack then
+        for _, item in pairs(backpack:GetChildren()) do
+            if item:IsA("Tool") and not table.find(list, item.Name) then table.insert(list, item.Name) end
+        end
+    end
+    if #list == 0 then table.insert(list, "Combat") end
+    return list
 end
+
+Config.SelectedWeapon = getAvailableWeapons()[1] or "Combat"
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "Cero_Hub_RisePiece"
 ScreenGui.Parent = game:GetService("CoreGui")
@@ -207,6 +218,45 @@ local function createDropdown(parent, labelText, currentVal, options, callback)
     btn.MouseButton1Click:Connect(function()
         index = index + 1 if index > #options then index = 1 end
         btn.Text = tostring(options[index]) callback(options[index])
+    end)
+end
+
+-- RESTORED WEAPON SELECTION FOR RISE PIECE [1]
+local function createWeaponDropdown(parent, labelText)
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1, -5, 0, 36)
+    frame.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
+    frame.Parent = parent
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 4)
+    
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(0.4, 0, 1, 0)
+    lbl.Position = UDim2.new(0, 10, 0, 0)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = labelText
+    lbl.TextColor3 = Color3.fromRGB(180, 180, 180)
+    lbl.Font = Enum.Font.SourceSans
+    lbl.TextSize = 14
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.Parent = frame
+    
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.5, 0, 0.75, 0)
+    btn.Position = UDim2.new(0.45, 0, 0.125, 0)
+    btn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    btn.Text = tostring(Config.SelectedWeapon)
+    btn.TextColor3 = Color3.fromRGB(255, 165, 0)
+    btn.Font = Enum.Font.SourceSansBold
+    btn.TextSize = 13
+    btn.Parent = frame
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 4)
+    
+    btn.MouseButton1Click:Connect(function()
+        local active = getAvailableWeapons()
+        local idx = 1
+        for i, w in ipairs(active) do if w == Config.SelectedWeapon then idx = i end end
+        idx = idx + 1 if idx > #active then idx = 1 end
+        Config.SelectedWeapon = active[idx] btn.Text = active[idx]
     end)
 end
 
@@ -371,42 +421,38 @@ local function createUnifiedFarmWindow(parent, panelTitle, farmGlobalKey, arrayO
         Instance.new("UICorner", row).CornerRadius = UDim.new(0, 3)
 
         row.MouseButton1Click:Connect(function()
-            TargetsSelected[optName] = not TargetsSelected[optName]
-            row.BackgroundColor3 = TargetsSelected[optName] and Color3.fromRGB(240, 140, 20) or Color3.fromRGB(28, 28, 30)
-            row.TextColor3 = TargetsSelected[optName] and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(170, 170, 170)
-            
-            local activeCount = 0
-            for _, v in ipairs(arrayOptionsList) do if TargetsSelected[v] then activeCount = activeCount + 1 end end
-            dropdownSelector.Text = activeCount > 0 and "(" .. activeCount .. ") Selected" or "Choose target..."
-        end)
-    end
+                        TargetsSelected[optName] = not TargetsSelected[optName]
+        row.BackgroundColor3 = TargetsSelected[optName] and Color3.fromRGB(240, 140, 20) or Color3.fromRGB(28, 28, 30)
+        row.TextColor3 = TargetsSelected[optName] and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(170, 170, 170)
+        
+        local activeCount = 0
+        for _, v in ipairs(arrayOptionsList) do 
+            if TargetsSelected[v] then 
+                activeCount = activeCount + 1 
+            end 
+        end
+        dropdownSelector.Text = activeCount > 0 and "(" .. activeCount .. ") Selected" or "Choose target..."
+    end)
+end
 end
 
+-- Render settings panel fields
 createDropdown(ContentFrame, "Farming Vector Angle:", Config.FarmMethod, {"Upper", "Lower", "Behind"}, function(v) Config.FarmMethod = v end)
+createWeaponDropdown(ContentFrame, "Equipped Attack Gear:") -- Weapon allocation picker injected back!
 createDropdown(ContentFrame, "Movement Vector:", Config.MovementType, {"Tween", "Teleport"}, function(v) Config.MovementType = v end)
 createDropdown(ContentFrame, "Tween Velocity speed:", Config.TweenSpeed, {150, 300, 450, 600}, function(v) Config.TweenSpeed = v end)
 createDistanceSlider(ContentFrame)
 
-local divMain = Instance.new("Frame", ContentFrame) 
-divMain.Size = UDim2.new(1, 0, 0, 2) 
+local divMain = Instance.new("Frame", ContentFrame)
+divMain.Size = UDim2.new(1, 0, 0, 2)
 divMain.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 
-createUnifiedFarmWindow(ContentFrame, "Start Farm Mobs", "autofarmNPC", {
-    "Bandit", "Clown", "Clown Strong", "Dark Bandit", "Green Bandit", "Hollow", "Jujutsu Student", "Sand Bandit", "Zombie"
-})
-
-createUnifiedFarmWindow(ContentFrame, "Start Farm Bosses", "autofarmBoss", {
-    "Bandit Boss", 
-    "Buggy Boss", 
-    "Ichigo Wizard Boss", 
-    "Sand Bandit Boss", 
-    "Shadow Boss"
-})
+createUnifiedFarmWindow(ContentFrame, "Start Farm Mobs", "autofarmNPC", {"Bandit", "Clown", "Clown Strong", "Dark Bandit", "Green Bandit", "Hollow", "Jujutsu Student", "Sand Bandit", "Zombie"})
+createUnifiedFarmWindow(ContentFrame, "Start Farm Bosses", "autofarmBoss", {"Bandit Boss", "Buggy Boss", "Ichigo Wizard Boss", "Sand Bandit Boss", "Shadow Boss"})
 -- =============================================================================
 -- [BOX 4: NAVIGATION MOVEMENT ENGINE & SKILL INJECTOR]
 -- =============================================================================
 
--- Background Thread: No-Clip Overwrite Mode
 task.spawn(function()
     while true do
         if _G.autofarmNPC or _G.autofarmBoss then
@@ -423,43 +469,36 @@ task.spawn(function()
     end
 end)
 
--- SAFE AUTOMATIC WEAPON CONTROLLER (Handles equip and respawns without glitch loops)
-task.spawn(function()
-    while true do
-        if _G.autofarmNPC or _G.autofarmBoss then
-            pcall(function()
-                local char = Player.Character
-                local backpack = Player:FindFirstChild("Backpack")
-                
-                if char and backpack then
-                    -- Check if you are currently holding any weapon tool item
-                    local currentlyHolding = char:FindFirstChildOfClass("Tool")
-                    
-                    if not currentlyHolding then
-                        -- Pull out the first weapon sitting idle inside your backpack inventory
-                        local weaponToEquip = backpack:FindFirstChildOfClass("Tool")
-                        if weaponToEquip then
-                            weaponToEquip.Parent = char
-                        end
-                    end
+-- SAFE STABLE TARGETED AUTO-EQUIP CONTROLLER (Never spams inventory layout parameters)
+local function handleStableAutoEquip(character)
+    task.wait(1.2) -- Safe interval for tools to load cleanly into backpack
+    if (_G.autofarmNPC or _G.autofarmBoss) and Config.SelectedWeapon ~= "Equip a weapon!" then
+        pcall(function()
+            local backpack = Player:WaitForChild("Backpack", 5)
+            if backpack then
+                local targetWeapon = backpack:FindFirstChild(Config.SelectedWeapon)
+                if targetWeapon then
+                    targetWeapon.Parent = character
                 end
-            end)
-        end
-        task.wait(0.5) -- Optimized checking pace to completely prevent hotbar stuttering
+            end
+        end)
     end
-end)
+end
 
--- Background Thread: Dynamic UseSkill Remote Fire Loop (Auto-detects active gear!)
+Player.CharacterAdded:Connect(handleStableAutoEquip)
+if Player.Character then task.spawn(handleStableAutoEquip, Player.Character) end
+
+-- High Speed Dynamic UseSkill Attack Thread
 task.spawn(function()
     while true do
         if _G.autofarmNPC or _G.autofarmBoss then
             pcall(function()
-                local weaponKey = getActiveWeaponName()
+                local weaponKey = Config.SelectedWeapon or "Combat"
                 local payload = { weaponKey, "M1" }
                 SkillRemote:FireServer(unpack(payload))
             end)
         end
-        task.wait(0.12) -- Balanced execution rate to maximize damage speed
+        task.wait(0.12)
     end
 end)
 
@@ -470,7 +509,7 @@ local function getFarmingCFrame(targetHrp)
     elseif Config.FarmMethod == "Lower" then
         return targetHrp.CFrame * CFrame.new(0, -d, 0) * CFrame.Angles(math.rad(90), 0, 0)
     else
-        return targetHrp.CFrame * CFrame.new(0, 0, d) -- Behind Position Matrix
+        return targetHrp.CFrame * CFrame.new(0, 0, d)
     end
 end
 
@@ -498,12 +537,10 @@ task.spawn(function()
                 local hrp = char and char:FindFirstChild("HumanoidRootPart")
                 
                 if hrp and humanoid and humanoid.Health > 0 then
-                    -- Traverse directly into the new Map Enemies directory structure
                     for _, entity in pairs(EnemiesFolder:GetChildren()) do
                         if not _G.autofarmNPC and not _G.autofarmBoss then break end
                         
                         if entity:IsA("Model") and TargetsSelected[entity.Name] == true then
-                            -- Check target type classing constraints
                             local isBoss = string.find(string.lower(entity.Name), "boss") ~= nil
                             local allowedToFarm = false
                             
@@ -518,7 +555,6 @@ task.spawn(function()
                                     moveToTarget(hrp, getFarmingCFrame(enemyHrp))
                                     task.wait(0.02)
                                     
-                                    -- Keep character locked on coordinates until enemy entity drops dead or player dies
                                     while (_G.autofarmNPC or _G.autofarmBoss) and enemyHum.Health > 0 and entity.Parent and humanoid.Health > 0 do
                                         hrp.CFrame = getFarmingCFrame(enemyHrp)
                                         task.wait()
