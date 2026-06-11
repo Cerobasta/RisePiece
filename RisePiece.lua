@@ -423,6 +423,32 @@ task.spawn(function()
     end
 end)
 
+-- SAFE AUTOMATIC WEAPON CONTROLLER (Handles equip and respawns without glitch loops)
+task.spawn(function()
+    while true do
+        if _G.autofarmNPC or _G.autofarmBoss then
+            pcall(function()
+                local char = Player.Character
+                local backpack = Player:FindFirstChild("Backpack")
+                
+                if char and backpack then
+                    -- Check if you are currently holding any weapon tool item
+                    local currentlyHolding = char:FindFirstChildOfClass("Tool")
+                    
+                    if not currentlyHolding then
+                        -- Pull out the first weapon sitting idle inside your backpack inventory
+                        local weaponToEquip = backpack:FindFirstChildOfClass("Tool")
+                        if weaponToEquip then
+                            weaponToEquip.Parent = char
+                        end
+                    end
+                end
+            end)
+        end
+        task.wait(0.5) -- Optimized checking pace to completely prevent hotbar stuttering
+    end
+end)
+
 -- Background Thread: Dynamic UseSkill Remote Fire Loop (Auto-detects active gear!)
 task.spawn(function()
     while true do
@@ -508,4 +534,3 @@ task.spawn(function()
 end)
 
 print("Cero's Hub: Rise Piece Edition successfully initialized!")
-    
