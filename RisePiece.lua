@@ -550,6 +550,108 @@ task.spawn(function()
                             if allowedToFarm then
                                 local enemyHrp = entity:FindFirstChild("HumanoidRootPart") or entity.PrimaryPart
                                 local enemyHum = entity:FindFirstChildOfClass("Humanoid")
+-- =============================================================================
+-- [BOX 4: NAVIGATION MOVEMENT ENGINE & PHYSICAL WEAPON ACTUATOR]
+-- =============================================================================
+
+-- Background Thread: Solid World Geometry No-Collide Override
+task.spawn(function()
+    while true do
+        if _G.autofarmNPC or _G.autofarmBoss then
+            pcall(function()
+                local char = Player.Character
+                if char then
+                    for _, part in pairs(char:GetDescendants()) do
+                        if part:IsA("BasePart") and part.CanCollide then part.CanCollide = false end
+                    end
+                end
+            end)
+        end
+        task.wait(0.1)
+    end
+end)
+
+-- Background Thread: Physical Weapon Actuator (Replaced remote spam with physical equips!)
+task.spawn(function()
+    while true do
+        if _G.autofarmNPC or _G.autofarmBoss then
+            pcall(function()
+                local char = Player.Character
+                local backpack = Player:FindFirstChild("Backpack")
+                
+                if char and backpack and Config.SelectedWeapon ~= "Equip a weapon!" then
+                    -- Check if the correct weapon is already inside your character's hand
+                    local activeWeapon = char:FindFirstChild(Config.SelectedWeapon)
+                    
+                    if not activeWeapon then
+                        -- If weapon is sitting idle inside your backpack, equip it exactly ONCE
+                        local weaponInBag = backpack:FindFirstChild(Config.SelectedWeapon)
+                        if weaponInBag then
+                            weaponInBag.Parent = char
+                            task.wait(0.15) -- Tiny delay to let physics load weapon slots safely
+                        end
+                    end
+                    
+                    -- Physically trigger the tool animation click instead of blasting the remote events
+                    local currentTool = char:FindFirstChild(Config.SelectedWeapon)
+                    if currentTool and currentTool:IsA("Tool") then
+                        currentTool:Activate()
+                    end
+                end
+            end)
+        end
+        task.wait(0.15) -- Tuned activation pace to match standard swing velocities smoothly
+    end
+end)
+
+local function getFarmingCFrame(targetHrp)
+    local d = Config.FarmDistance
+    if Config.FarmMethod == "Upper" then
+        return targetHrp.CFrame * CFrame.new(0, d, 0) * CFrame.Angles(math.rad(-90), 0, 0)
+    elseif Config.FarmMethod == "Lower" then
+        return targetHrp.CFrame * CFrame.new(0, -d, 0) * CFrame.Angles(math.rad(90), 0, 0)
+    else
+        return targetHrp.CFrame * CFrame.new(0, 0, d)
+    end
+end
+
+local function moveToTarget(hrp, targetCFrame)
+    if Config.MovementType == "Teleport" then
+        hrp.CFrame = targetCFrame
+    else
+        local dist = (hrp.Position - targetCFrame.Position).Magnitude
+        local duration = dist / math.max(Config.TweenSpeed, 50)
+        local tInfo = TweenInfo.new(duration, Enum.EasingStyle.Linear)
+        local tween = TweenService:Create(hrp, tInfo, {CFrame = targetCFrame})
+        tween:Play()
+        tween.Completed:Wait()
+    end
+end
+
+-- Persistent Search Scraper Engine
+task.spawn(function()
+    while true do
+        task.wait(0.2)
+        if _G.autofarmNPC or _G.autofarmBoss then
+            pcall(function()
+                local char = Player.Character
+                local humanoid = char and char:FindFirstChildOfClass("Humanoid")
+                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                
+                if hrp and humanoid and humanoid.Health > 0 then
+                    for _, entity in pairs(EnemiesFolder:GetChildren()) do
+                        if not _G.autofarmNPC and not _G.autofarmBoss then break end
+                        
+                        if entity:IsA("Model") and TargetsSelected[entity.Name] == true then
+                            local isBoss = string.find(string.lower(entity.Name), "boss") ~= nil
+                            local allowedToFarm = false
+                            
+                            if isBoss and _G.autofarmBoss then allowedToFarm = true
+                            elseif not isBoss and _G.autofarmNPC then allowedToFarm = true end
+                            
+                            if allowedToFarm then
+                                local enemyHrp = entity:FindFirstChild("HumanoidRootPart") or entity.PrimaryPart
+                                local enemyHum = entity:FindFirstChildOfClass("Humanoid")
                                 
                                 if enemyHrp and enemyHum and enemyHum.Health > 0 and entity.Parent then
                                     moveToTarget(hrp, getFarmingCFrame(enemyHrp))
@@ -569,4 +671,4 @@ task.spawn(function()
     end
 end)
 
-print("Cero's Hub: Rise Piece Edition successfully initialized!")
+print("Cero's Hub: Physical Actuator Loops Successfully Armed!")
