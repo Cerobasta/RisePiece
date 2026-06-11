@@ -1,4 +1,4 @@
--- Anti-Duplicate Window Cleaner
+-- Anti-Duplicate Framework Window Shield
 if game:GetService("CoreGui"):FindFirstChild("Cero_Hub_RisePiece") then
     game:GetService("CoreGui").Cero_Hub_RisePiece:Destroy()
 end
@@ -9,13 +9,13 @@ _G.autofarmBoss = false
 
 local Config = {
     FarmMethod = "Upper",      -- "Upper", "Lower", "Behind"
-    FarmDistance = 5,          -- Custom offset via slider
-    SelectedWeapon = "Default",-- Dynamically managed by your dropdown choices
+    FarmDistance = 5,          -- Bound distance via slider config
+    SelectedWeapon = "Default",-- Managed dynamically by your gear choices
     MovementType = "Teleport", -- "Tween" or "Teleport"
     TweenSpeed = 300
 }
 
--- Multi-Selection Target Arrays (Reorganized based on Rise Piece Dex)
+-- Multi-Selection Target Arrays (Meticulously matched to Rise Piece indexes)
 local TargetsSelected = {
     -- Normal Grunts Class
     ["Bandit"] = false,
@@ -28,23 +28,24 @@ local TargetsSelected = {
     ["Sand Bandit"] = false,
     ["Zombie"] = false,
 
-    -- Bosses Class
+    -- Bosses Class (Featuring Sukuna Boss and Vasto Lorde Boss path updates!)
     ["Bandit Boss"] = false,
     ["Buggy Boss"] = false,
     ["Ichigo Wizard Boss"] = false,
     ["Sand Bandit Boss"] = false,
-    ["Shadow Boss"] = false
+    ["Shadow Boss"] = false,
+    ["Sukuna Boss"] = false,
+    ["Vasto Lorde Boss"] = false
 }
 
--- Game Engine Path Configurations
+-- Game Engine Hierarchy Paths Mappings
 local EnemiesFolder = workspace:WaitForChild("Mapa"):WaitForChild("Enemies")
-local SkillRemote = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("UseSkill")
 
 local Player = game:GetService("Players").LocalPlayer
 local TweenService = game:GetService("TweenService")
 local inputService = game:GetService("UserInputService")
 
--- Active Tool Scanner Engine
+-- Active Character Tool Inventory Scanner Core
 local function getAvailableWeapons()
     local list = {}
     local char = Player.Character
@@ -64,12 +65,13 @@ local function getAvailableWeapons()
     return list
 end
 
-Config.SelectedWeapon = getAvailableWeapons()[1] or "Combat"
+Config.SelectedWeapon = getAvailableWeapons() or "Combat"
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "Cero_Hub_RisePiece"
 ScreenGui.Parent = game:GetService("CoreGui")
 ScreenGui.ResetOnSpawn = false
 
+-- Draggable mechanical framework calculation helper
 local function makeDraggable(frame, parentFrame)
     local target = parentFrame or frame
     local dragging, dragInput, dragStart, startPos
@@ -88,6 +90,7 @@ local function makeDraggable(frame, parentFrame)
     end)
 end
 
+-- Main Window Frame Window Panel
 local MainFrame = Instance.new("Frame")
 MainFrame.Size = UDim2.new(0, 540, 0, 390)
 MainFrame.Position = UDim2.new(0.3, 0, 0.25, 0)
@@ -96,6 +99,7 @@ MainFrame.Active = true
 MainFrame.Parent = ScreenGui
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
 
+-- Signature Thick Border Line Accent 
 local BorderStroke = Instance.new("UIStroke")
 BorderStroke.Thickness = 4
 BorderStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
@@ -106,6 +110,7 @@ task.spawn(function()
     end
 end)
 
+-- Header Top Bar Panel Bar Layout
 local TopBar = Instance.new("Frame")
 TopBar.Size = UDim2.new(1, 0, 0, 40)
 TopBar.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
@@ -125,6 +130,7 @@ TitleText.TextSize = 16
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 TitleText.Parent = TopBar
 
+-- Floating Overlay Toggle Orb Button Frame
 local FloatBtn = Instance.new("TextButton")
 FloatBtn.Size = UDim2.new(0, 55, 0, 55)
 FloatBtn.Position = UDim2.new(0.02, 0, 0.45, 0)
@@ -150,6 +156,7 @@ FloatBtn.MouseButton1Click:Connect(function()
     FloatBtn.TextColor3 = MainFrame.Visible and Color3.fromRGB(230, 50, 50) or Color3.fromRGB(255, 165, 0)
 end)
 
+-- Left Sidebar Tabs Navigation Panel Layout
 local Sidebar = Instance.new("Frame")
 Sidebar.Size = UDim2.new(0, 130, 1, -40)
 Sidebar.Position = UDim2.new(0, 0, 0, 40)
@@ -168,6 +175,7 @@ TabBtn.TextSize = 13
 TabBtn.Parent = Sidebar
 Instance.new("UICorner", TabBtn).CornerRadius = UDim.new(0, 4)
 
+-- Scrolling Panel Container Window Canvas
 local ContentFrame = Instance.new("ScrollingFrame")
 ContentFrame.Size = UDim2.new(1, -150, 1, -55)
 ContentFrame.Position = UDim2.new(0, 140, 0, 45)
@@ -221,7 +229,6 @@ local function createDropdown(parent, labelText, currentVal, options, callback)
     end)
 end
 
--- RESTORED WEAPON SELECTION FOR RISE PIECE [1]
 local function createWeaponDropdown(parent, labelText)
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(1, -5, 0, 36)
@@ -438,7 +445,7 @@ end
 
 -- Render settings panel fields
 createDropdown(ContentFrame, "Farming Vector Angle:", Config.FarmMethod, {"Upper", "Lower", "Behind"}, function(v) Config.FarmMethod = v end)
-createWeaponDropdown(ContentFrame, "Equipped Attack Gear:") -- Weapon allocation picker injected back!
+createWeaponDropdown(ContentFrame, "Equipped Attack Gear:")
 createDropdown(ContentFrame, "Movement Vector:", Config.MovementType, {"Tween", "Teleport"}, function(v) Config.MovementType = v end)
 createDropdown(ContentFrame, "Tween Velocity speed:", Config.TweenSpeed, {150, 300, 450, 600}, function(v) Config.TweenSpeed = v end)
 createDistanceSlider(ContentFrame)
@@ -448,9 +455,9 @@ divMain.Size = UDim2.new(1, 0, 0, 2)
 divMain.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 
 createUnifiedFarmWindow(ContentFrame, "Start Farm Mobs", "autofarmNPC", {"Bandit", "Clown", "Clown Strong", "Dark Bandit", "Green Bandit", "Hollow", "Jujutsu Student", "Sand Bandit", "Zombie"})
-createUnifiedFarmWindow(ContentFrame, "Start Farm Bosses", "autofarmBoss", {"Bandit Boss", "Buggy Boss", "Ichigo Wizard Boss", "Sand Bandit Boss", "Shadow Boss"})
+createUnifiedFarmWindow(ContentFrame, "Start Farm Bosses", "autofarmBoss", {"Bandit Boss", "Buggy Boss", "Ichigo Wizard Boss", "Sand Bandit Boss", "Shadow Boss", "Sukuna Boss", "Vasto Lorde Boss"})
 -- =============================================================================
--- [BOX 4: NAVIGATION MOVEMENT ENGINE & SKILL INJECTOR]
+-- [BOX 4: NAVIGATION MOVEMENT ENGINE & PHYSICAL WEAPON ACTUATOR]
 -- =============================================================================
 
 task.spawn(function()
@@ -469,7 +476,7 @@ task.spawn(function()
     end
 end)
 
--- SAFE STABLE TARGETED AUTO-EQUIP CONTROLLER (Never spams inventory layout parameters)
+-- SAFE STABLE TARGETED AUTO-EQUIP CONTROLLER (Never spams or triggers slot stutters)
 local function handleStableAutoEquip(character)
     task.wait(1.2) -- Safe interval for tools to load cleanly into backpack
     if (_G.autofarmNPC or _G.autofarmBoss) and Config.SelectedWeapon ~= "Equip a weapon!" then
@@ -479,6 +486,7 @@ local function handleStableAutoEquip(character)
                 local targetWeapon = backpack:FindFirstChild(Config.SelectedWeapon)
                 if targetWeapon then
                     targetWeapon.Parent = character
+                    task.wait(0.15)
                 end
             end
         end)
@@ -488,111 +496,13 @@ end
 Player.CharacterAdded:Connect(handleStableAutoEquip)
 if Player.Character then task.spawn(handleStableAutoEquip, Player.Character) end
 
--- High Speed Dynamic UseSkill Attack Thread
-task.spawn(function()
-    while true do
-        if _G.autofarmNPC or _G.autofarmBoss then
-            pcall(function()
-                local weaponKey = Config.SelectedWeapon or "Combat"
-                local payload = { weaponKey, "M1" }
-                SkillRemote:FireServer(unpack(payload))
-            end)
-        end
-        task.wait(0.12)
-    end
-end)
-
-local function getFarmingCFrame(targetHrp)
-    local d = Config.FarmDistance
-    if Config.FarmMethod == "Upper" then
-        return targetHrp.CFrame * CFrame.new(0, d, 0) * CFrame.Angles(math.rad(-90), 0, 0)
-    elseif Config.FarmMethod == "Lower" then
-        return targetHrp.CFrame * CFrame.new(0, -d, 0) * CFrame.Angles(math.rad(90), 0, 0)
-    else
-        return targetHrp.CFrame * CFrame.new(0, 0, d)
-    end
-end
-
-local function moveToTarget(hrp, targetCFrame)
-    if Config.MovementType == "Teleport" then
-        hrp.CFrame = targetCFrame
-    else
-        local dist = (hrp.Position - targetCFrame.Position).Magnitude
-        local duration = dist / math.max(Config.TweenSpeed, 50)
-        local tInfo = TweenInfo.new(duration, Enum.EasingStyle.Linear)
-        local tween = TweenService:Create(hrp, tInfo, {CFrame = targetCFrame})
-        tween:Play()
-        tween.Completed:Wait()
-    end
-end
-
--- Persistent Search Scraper Engine
-task.spawn(function()
-    while true do
-        task.wait(0.2)
-        if _G.autofarmNPC or _G.autofarmBoss then
-            pcall(function()
-                local char = Player.Character
-                local humanoid = char and char:FindFirstChildOfClass("Humanoid")
-                local hrp = char and char:FindFirstChild("HumanoidRootPart")
-                
-                if hrp and humanoid and humanoid.Health > 0 then
-                    for _, entity in pairs(EnemiesFolder:GetChildren()) do
-                        if not _G.autofarmNPC and not _G.autofarmBoss then break end
-                        
-                        if entity:IsA("Model") and TargetsSelected[entity.Name] == true then
-                            local isBoss = string.find(string.lower(entity.Name), "boss") ~= nil
-                            local allowedToFarm = false
-                            
-                            if isBoss and _G.autofarmBoss then allowedToFarm = true
-                            elseif not isBoss and _G.autofarmNPC then allowedToFarm = true end
-                            
-                            if allowedToFarm then
-                                local enemyHrp = entity:FindFirstChild("HumanoidRootPart") or entity.PrimaryPart
-                                local enemyHum = entity:FindFirstChildOfClass("Humanoid")
--- =============================================================================
--- [BOX 4: NAVIGATION MOVEMENT ENGINE & PHYSICAL WEAPON ACTUATOR]
--- =============================================================================
-
--- Background Thread: Solid World Geometry No-Collide Override
+-- Background Thread: Native Physical Click Actuator 
 task.spawn(function()
     while true do
         if _G.autofarmNPC or _G.autofarmBoss then
             pcall(function()
                 local char = Player.Character
-                if char then
-                    for _, part in pairs(char:GetDescendants()) do
-                        if part:IsA("BasePart") and part.CanCollide then part.CanCollide = false end
-                    end
-                end
-            end)
-        end
-        task.wait(0.1)
-    end
-end)
-
--- Background Thread: Physical Weapon Actuator (Replaced remote spam with physical equips!)
-task.spawn(function()
-    while true do
-        if _G.autofarmNPC or _G.autofarmBoss then
-            pcall(function()
-                local char = Player.Character
-                local backpack = Player:FindFirstChild("Backpack")
-                
-                if char and backpack and Config.SelectedWeapon ~= "Equip a weapon!" then
-                    -- Check if the correct weapon is already inside your character's hand
-                    local activeWeapon = char:FindFirstChild(Config.SelectedWeapon)
-                    
-                    if not activeWeapon then
-                        -- If weapon is sitting idle inside your backpack, equip it exactly ONCE
-                        local weaponInBag = backpack:FindFirstChild(Config.SelectedWeapon)
-                        if weaponInBag then
-                            weaponInBag.Parent = char
-                            task.wait(0.15) -- Tiny delay to let physics load weapon slots safely
-                        end
-                    end
-                    
-                    -- Physically trigger the tool animation click instead of blasting the remote events
+                if char and Config.SelectedWeapon ~= "Equip a weapon!" then
                     local currentTool = char:FindFirstChild(Config.SelectedWeapon)
                     if currentTool and currentTool:IsA("Tool") then
                         currentTool:Activate()
@@ -600,7 +510,7 @@ task.spawn(function()
                 end
             end)
         end
-        task.wait(0.15) -- Tuned activation pace to match standard swing velocities smoothly
+        task.wait(0.15)
     end
 end)
 
@@ -671,4 +581,4 @@ task.spawn(function()
     end
 end)
 
-print("Cero's Hub: Physical Actuator Loops Successfully Armed!")
+print("Cero's Hub: Rise Piece Edition successfully initialized!")
