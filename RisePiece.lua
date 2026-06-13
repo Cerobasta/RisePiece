@@ -637,7 +637,7 @@ local function createUnifiedFarmWindow(parent, panelTitle, farmGlobalKey, arrayO
         Instance.new("UICorner", row).CornerRadius = UDim.new(0, 3)
 
         row.MouseButton1Click:Connect(function()
-                            TargetsSelected[optName] = not TargetsSelected[optName]
+        TargetsSelected[optName] = not TargetsSelected[optName]
         row.BackgroundColor3 = TargetsSelected[optName] and Color3.fromRGB(240, 140, 20) or Color3.fromRGB(28, 28, 30)
         row.TextColor3 = TargetsSelected[optName] and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(170, 170, 170)
         
@@ -664,10 +664,7 @@ divMain.Size = UDim2.new(1, 0, 0, 2)
 divMain.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 
 createUnifiedFarmWindow(ContentFrame, "Start Farm Mobs", "autofarmNPC", {"Bandit", "Clown", "Clown Strong", "Dark Bandit", "Green Bandit", "Hollow", "Jujutsu Student", "Sand Bandit", "Zombie"})
-
--- FIXED: Steve Boss added accurately right alongside your other boss targets!
 createUnifiedFarmWindow(ContentFrame, "Start Farm Bosses", "autofarmBoss", {"Bandit Boss", "Buggy Boss", "Ichigo Wizard Boss", "Sand Bandit Boss", "Shadow Boss", "Steve Boss", "Sukuna Boss", "Vasto Lorde Boss"})
-    
 -- =============================================================================
 -- [BOX 4: NAVIGATION MOVEMENT ENGINE & PHYSICAL WEAPON ACTUATOR]
 -- =============================================================================
