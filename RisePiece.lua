@@ -223,6 +223,7 @@ local function createDropdown(parent, labelText, currentVal, options, callback)
     end)
 end
 
+-- FIXED LOCATION: Defined clearly before use to resolve nil errors!
 local function createWeaponDropdown(parent, labelText)
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(1, -5, 0, 36)
@@ -421,19 +422,20 @@ local function createUnifiedFarmWindow(parent, panelTitle, farmGlobalKey, arrayO
         row.Parent = popoutMenu
         Instance.new("UICorner", row).CornerRadius = UDim.new(0, 3)
 
-        row.MouseButton1Click:Connect(function()
-                        TargetsSelected[optName] = not TargetsSelected[optName]
-        row.BackgroundColor3 = TargetsSelected[optName] and Color3.fromRGB(240, 140, 20) or Color3.fromRGB(28, 28, 30)
-        row.TextColor3 = TargetsSelected[optName] and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(170, 170, 170)
-        
-        local activeCount = 0
-        for _, v in ipairs(arrayOptionsList) do 
-            if TargetsSelected[v] then 
-                activeCount = activeCount + 1 
-            end 
-        end
-        dropdownSelector.Text = activeCount > 0 and "(" .. activeCount .. ") Selected" or "Choose target..."
-    end)
+                row.MouseButton1Click:Connect(function()
+            TargetsSelected[optName] = not TargetsSelected[optName]
+            row.BackgroundColor3 = TargetsSelected[optName] and Color3.fromRGB(240, 140, 20) or Color3.fromRGB(28, 28, 30)
+            row.TextColor3 = TargetsSelected[optName] and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(170, 170, 170)
+            
+            local activeCount = 0
+            for _, v in ipairs(arrayOptionsList) do 
+                if TargetsSelected[v] then 
+                    activeCount = activeCount + 1 
+                end 
+            end
+            dropdownSelector.Text = activeCount > 0 and "(" .. activeCount .. ") Selected" or "Choose target..."
+        end)
+    end
 end
 end
 
