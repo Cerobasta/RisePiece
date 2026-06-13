@@ -28,7 +28,7 @@ local TargetsSelected = {
     ["Sand Bandit"] = false,
     ["Zombie"] = false,
 
-    -- Bosses Class (Updated with Steve Boss!)
+    -- Bosses Class
     ["Bandit Boss"] = false,
     ["Buggy Boss"] = false,
     ["Ichigo Wizard Boss"] = false,
@@ -67,13 +67,11 @@ local function getAvailableWeapons()
 end
 
 Config.SelectedWeapon = getAvailableWeapons() or "Combat"
-
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "Cero_Hub_RisePiece"
 ScreenGui.Parent = game:GetService("CoreGui")
 ScreenGui.ResetOnSpawn = false
 
--- Draggable mechanical framework calculation helper
 local function makeDraggable(frame, parentFrame)
     local target = parentFrame or frame
     local dragging, dragInput, dragStart, startPos
@@ -92,7 +90,6 @@ local function makeDraggable(frame, parentFrame)
     end)
 end
 
--- Main Window Frame Window Panel
 local MainFrame = Instance.new("Frame")
 MainFrame.Size = UDim2.new(0, 540, 0, 390)
 MainFrame.Position = UDim2.new(0.3, 0, 0.25, 0)
@@ -101,7 +98,6 @@ MainFrame.Active = true
 MainFrame.Parent = ScreenGui
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
 
--- Signature Thick Border Line Accent 
 local BorderStroke = Instance.new("UIStroke")
 BorderStroke.Thickness = 4
 BorderStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
@@ -112,7 +108,6 @@ task.spawn(function()
     end
 end)
 
--- Header Top Bar Panel Bar Layout
 local TopBar = Instance.new("Frame")
 TopBar.Size = UDim2.new(1, 0, 0, 40)
 TopBar.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
@@ -132,7 +127,6 @@ TitleText.TextSize = 16
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 TitleText.Parent = TopBar
 
--- Floating Overlay Toggle Orb Button Frame
 local FloatBtn = Instance.new("TextButton")
 FloatBtn.Size = UDim2.new(0, 55, 0, 55)
 FloatBtn.Position = UDim2.new(0.02, 0, 0.45, 0)
@@ -158,7 +152,6 @@ FloatBtn.MouseButton1Click:Connect(function()
     FloatBtn.TextColor3 = MainFrame.Visible and Color3.fromRGB(230, 50, 50) or Color3.fromRGB(255, 165, 0)
 end)
 
--- Left Sidebar Tabs Navigation Panel Layout
 local Sidebar = Instance.new("Frame")
 Sidebar.Size = UDim2.new(0, 130, 1, -40)
 Sidebar.Position = UDim2.new(0, 0, 0, 40)
@@ -177,7 +170,6 @@ TabBtn.TextSize = 13
 TabBtn.Parent = Sidebar
 Instance.new("UICorner", TabBtn).CornerRadius = UDim.new(0, 4)
 
--- Scrolling Panel Container Window Canvas
 local ContentFrame = Instance.new("ScrollingFrame")
 ContentFrame.Size = UDim2.new(1, -150, 1, -55)
 ContentFrame.Position = UDim2.new(0, 140, 0, 45)
@@ -194,213 +186,6 @@ ContentFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
 UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
     ContentFrame.CanvasSize = UDim2.new(0, 0, 0, UIListLayout.AbsoluteContentSize.Y + 30)
 end)
-
-local function createDropdown(parent, labelText, currentVal, options, callback)
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(1, -5, 0, 36)
-    frame.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
-    frame.Parent = parent
-    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 4)
-    
-    local lbl = Instance.new("TextLabel")
-    lbl.Size = UDim2.new(0.4, 0, 1, 0)
-    lbl.Position = UDim2.new(0, 10, 0, 0)
-    lbl.BackgroundTransparency = 1
-    lbl.Text = labelText
-    lbl.TextColor3 = Color3.fromRGB(180, 180, 180)
-    lbl.Font = Enum.Font.SourceSans
-    lbl.TextSize = 14
-    lbl.TextXAlignment = Enum.TextXAlignment.Left
-    lbl.Parent = frame
-    
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.5, 0, 0.75, 0)
-    btn.Position = UDim2.new(0.45, 0, 0.125, 0)
-    btn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-    btn.Text = tostring(currentVal)
-    btn.TextColor3 = Color3.fromRGB(240, 240, 240)
-    btn.Font = Enum.Font.SourceSansBold
-    btn.TextSize = 13
-    btn.Parent = frame
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 4)
-    
-    local index = 1
-    for i, o in ipairs(options) do if o == currentVal then index = i end end
-    btn.MouseButton1Click:Connect(function()
-        index = index + 1 if index > #options then index = 1 end
-        btn.Text = tostring(options[index]) callback(options[index])
-    end)
-end
-
-local function createWeaponDropdown(parent, labelText)
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(1, -5, 0, 36)
-    frame.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
-    frame.Parent = parent
-    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 4)
-    
-    local lbl = Instance.new("TextLabel")
-    lbl.Size = UDim2.new(0.4, 0, 1, 0)
-    lbl.Position = UDim2.new(0, 10, 0, 0)
-    lbl.BackgroundTransparency = 1
-    lbl.Text = labelText
-    lbl.TextColor3 = Color3.fromRGB(180, 180, 180)
-    lbl.Font = Enum.Font.SourceSans
-    lbl.TextSize = 14
-    lbl.TextXAlignment = Enum.TextXAlignment.Left
-    lbl.Parent = frame
-    
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.5, 0, 0.75, 0)
-    btn.Position = UDim2.new(0.45, 0, 0.125, 0)
-    btn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-    btn.Text = tostring(Config.SelectedWeapon)
-    btn.TextColor3 = Color3.fromRGB(255, 165, 0)
-    btn.Font = Enum.Font.SourceSansBold
-    btn.TextSize = 13
-    btn.Parent = frame
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 4)
-    
-    btn.MouseButton1Click:Connect(function()
-        local active = getAvailableWeapons()
-        local idx = 1
-        for i, w in ipairs(active) do if w == Config.SelectedWeapon then idx = i end end
-        idx = idx + 1 if idx > #active then idx = 1 end
-        Config.SelectedWeapon = active[idx] btn.Text = active[idx]
-    end)
-end
-
-local function createDistanceSlider(parent)
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(1, -5, 0, 45)
-    frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    frame.Parent = parent
-    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 4)
-    
-    local lbl = Instance.new("TextLabel")
-    lbl.Size = UDim2.new(0.5, 0, 0, 20)
-    lbl.Position = UDim2.new(0, 10, 0, 4)
-    lbl.BackgroundTransparency = 1
-    lbl.Text = "Farm Distance: " .. tostring(Config.FarmDistance) .. " studs"
-    lbl.TextColor3 = Color3.fromRGB(180, 180, 180)
-    lbl.Font = Enum.Font.SourceSans
-    lbl.TextSize = 13
-    lbl.TextXAlignment = Enum.TextXAlignment.Left
-    lbl.Parent = frame
-    
-    local sliderBar = Instance.new("TextButton")
-    sliderBar.Size = UDim2.new(0.9, 0, 0, 6)
-    sliderBar.Position = UDim2.new(0.05, 0, 0, 28)
-    sliderBar.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-    sliderBar.Text = ""
-    sliderBar.Parent = frame
-    Instance.new("UICorner", sliderBar).CornerRadius = UDim.new(0, 3)
-    
-    local sliderFill = Instance.new("Frame")
-    sliderFill.Size = UDim2.new((Config.FarmDistance - 6) / 18, 0, 1, 0)
-    sliderFill.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
-    sliderFill.BorderSizePixel = 0
-    sliderFill.Parent = sliderBar
-    Instance.new("UICorner", sliderFill).CornerRadius = UDim.new(0, 3)
-    
-    local function updateSlider(input)
-        local percentage = math.clamp((input.Position.X - sliderBar.AbsolutePosition.X) / sliderBar.AbsoluteSize.X, 0, 1)
-        sliderFill.Size = UDim2.new(percentage, 0, 1, 0)
-        local calculatedDistance = math.floor(6 + (percentage * 18))
-        Config.FarmDistance = calculatedDistance
-        lbl.Text = "Farm Distance: " .. tostring(calculatedDistance) .. " studs"
-    end
-    
-    local slidingActive = false
-    sliderBar.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            slidingActive = true updateSlider(input)
-        end
-    end)
-    inputService.InputChanged:Connect(function(input)
-        if slidingActive and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-            updateSlider(input)
-        end
-    end)
-    sliderBar.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            slidingActive = false
-        end
-    end)
-end
-
-local function createUnifiedFarmWindow(parent, panelTitle, farmGlobalKey, arrayOptionsList)
-    local containerFrame = Instance.new("Frame")
-    containerFrame.Size = UDim2.new(1, -5, 0, 85)
-    containerFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 26)
-    containerFrame.Parent = parent
-    Instance.new("UICorner", containerFrame).CornerRadius = UDim.new(0, 6)
-    
-    local descLbl = Instance.new("TextLabel")
-    descLbl.Size = UDim2.new(0.6, 0, 0, 22)
-    descLbl.Position = UDim2.new(0, 12, 0, 4)
-    descLbl.BackgroundTransparency = 1
-    descLbl.Text = panelTitle
-    descLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
-    descLbl.Font = Enum.Font.SourceSansBold
-    descLbl.TextSize = 13
-    descLbl.TextXAlignment = Enum.TextXAlignment.Left
-    descLbl.Parent = containerFrame
-    
-    local subDesc = Instance.new("TextLabel")
-    subDesc.Size = UDim2.new(0.6, 0, 0, 15)
-    subDesc.Position = UDim2.new(0, 12, 0, 22)
-    subDesc.BackgroundTransparency = 1
-    subDesc.Text = "Toggle to start/stop loop targeting choices."
-    subDesc.TextColor3 = Color3.fromRGB(130, 130, 135)
-    subDesc.Font = Enum.Font.SourceSans
-    subDesc.TextSize = 11
-    subDesc.TextXAlignment = Enum.TextXAlignment.Left
-    subDesc.Parent = containerFrame
-
-    local farmToggle = Instance.new("TextButton")
-    farmToggle.Size = UDim2.new(0, 45, 0, 20)
-    farmToggle.Position = UDim2.new(1, -60, 0, 12)
-    farmToggle.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
-    farmToggle.Text = ""
-    farmToggle.Parent = containerFrame
-    Instance.new("UICorner", farmToggle).CornerRadius = UDim.new(0, 10)
-    
-    local slideBall = Instance.new("Frame")
-    slideBall.Size = UDim2.new(0, 16, 0, 16)
-    slideBall.Position = UDim2.new(0, 2, 0, 2)
-    slideBall.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    slideBall.Parent = farmToggle
-    Instance.new("UICorner", slideBall).CornerRadius = UDim.new(1, 0)
-    
-    farmToggle.MouseButton1Click:Connect(function()
-        _G[farmGlobalKey] = not _G[farmGlobalKey]
-        farmToggle.BackgroundColor3 = _G[farmGlobalKey] and Color3.fromRGB(40, 150, 80) or Color3.fromRGB(50, 50, 55)
-        slideBall.Position = _G[farmGlobalKey] and UDim2.new(1, -18, 0, 2) or UDim2.new(0, 2, 0, 2)
-    end)
-
-    local selectLbl = Instance.new("TextLabel")
-    selectLbl.Size = UDim2.new(0.4, 0, 0, 30)
-    selectLbl.Position = UDim2.new(0, 12, 0, 48)
-    selectLbl.BackgroundTransparency = 1
-    selectLbl.Text = "Select Target"
-    selectLbl.TextColor3 = Color3.fromRGB(200, 200, 200)
-    selectLbl.Font = Enum.Font.SourceSansBold
-    selectLbl.TextSize = 13
-    selectLbl.TextXAlignment = Enum.TextXAlignment.Left
-    selectLbl.Parent = containerFrame
-
-    local dropdownSelector = Instance.new("TextButton")
-    dropdownSelector.Size = UDim2.new(0, 160, 0, 26)
-    dropdownSelector.Position = UDim2.new(1, -175, 0, 50)
-    dropdownSelector.BackgroundColor3 = Color3.fromRGB(32, 32, 35)
-    dropdownSelector.Text = "Choose target..."
-    dropdownSelector.TextColor3 = Color3.fromRGB(150, 150, 155)
-    dropdownSelector.Font = Enum.Font.SourceSans
-    dropdownSelector.TextSize = 13
-    dropdownSelector.Parent = containerFrame
-    Instance.new("UICorner", dropdownSelector).CornerRadius = UDim.new(0, 4)
-
 local function createDropdown(parent, labelText, currentVal, options, callback)
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(1, -5, 0, 36)
@@ -637,7 +422,7 @@ local function createUnifiedFarmWindow(parent, panelTitle, farmGlobalKey, arrayO
         Instance.new("UICorner", row).CornerRadius = UDim.new(0, 3)
 
         row.MouseButton1Click:Connect(function()
-        TargetsSelected[optName] = not TargetsSelected[optName]
+                        TargetsSelected[optName] = not TargetsSelected[optName]
         row.BackgroundColor3 = TargetsSelected[optName] and Color3.fromRGB(240, 140, 20) or Color3.fromRGB(28, 28, 30)
         row.TextColor3 = TargetsSelected[optName] and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(170, 170, 170)
         
@@ -685,10 +470,9 @@ task.spawn(function()
     end
 end)
 
--- SAFE STABLE TARGETED AUTO-EQUIP CONTROLLER (Never spams or triggers slot stutters)
 local function handleStableAutoEquip(character)
-    task.wait(1.2) -- Safe interval for tools to load cleanly into backpack
-    if (_G.autofarmNPC or _G.autofarmBoss) and Config.SelectedWeapon ~= "Equip a weapon!" then
+    task.wait(1.2)
+    if (_G.autofarmNPC or _G.autofarmBoss) and Config.SelectedWeapon ~= "Default" then
         pcall(function()
             local backpack = Player:WaitForChild("Backpack", 5)
             if backpack then
@@ -705,13 +489,12 @@ end
 Player.CharacterAdded:Connect(handleStableAutoEquip)
 if Player.Character then task.spawn(handleStableAutoEquip, Player.Character) end
 
--- Background Thread: Native Physical Click Actuator 
 task.spawn(function()
     while true do
         if _G.autofarmNPC or _G.autofarmBoss then
             pcall(function()
                 local char = Player.Character
-                if char and Config.SelectedWeapon ~= "Equip a weapon!" then
+                if char and Config.SelectedWeapon ~= "Default" then
                     local currentTool = char:FindFirstChild(Config.SelectedWeapon)
                     if currentTool and currentTool:IsA("Tool") then
                         currentTool:Activate()
@@ -747,7 +530,6 @@ local function moveToTarget(hrp, targetCFrame)
     end
 end
 
--- Persistent Search Scraper Engine
 task.spawn(function()
     while true do
         task.wait(0.2)
