@@ -36,7 +36,9 @@ local TargetsSelected = {
     ["Shadow Boss"] = false,
     ["Steve Boss"] = false,
     ["Sukuna Boss"] = false,
-    ["Vasto Lorde Boss"] = false
+    ["Vasto Lorde Boss"] = false,
+    ["Aizen Boss"] = false,
+    ["Starkk Boss"] = false
 }
 
 -- Game Engine Hierarchy Paths Mappings
@@ -449,7 +451,7 @@ divMain.Size = UDim2.new(1, 0, 0, 2)
 divMain.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 
 createUnifiedFarmWindow(ContentFrame, "Start Farm Mobs", "autofarmNPC", {"Bandit", "Clown", "Clown Strong", "Dark Bandit", "Green Bandit", "Hollow", "Jujutsu Student", "Sand Bandit", "Zombie"})
-createUnifiedFarmWindow(ContentFrame, "Start Farm Bosses", "autofarmBoss", {"Bandit Boss", "Buggy Boss", "Ichigo Wizard Boss", "Sand Bandit Boss", "Shadow Boss", "Steve Boss", "Sukuna Boss", "Vasto Lorde Boss"})
+createUnifiedFarmWindow(ContentFrame, "Start Farm Bosses", "autofarmBoss", {"Bandit Boss", "Buggy Boss", "Ichigo Wizard Boss", "Sand Bandit Boss", "Shadow Boss", "Steve Boss", "Sukuna Boss", "Vasto Lorde Boss", "Starkk Boss", "Aizen Boss"})
 -- =============================================================================
 -- [BOX 4: NAVIGATION MOVEMENT ENGINE & PHYSICAL WEAPON ACTUATOR]
 -- =============================================================================
